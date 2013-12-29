@@ -14,15 +14,20 @@ namespace NameGeneration
         /// <returns>FullName instance containing a random first and last name.</returns>
         public FullName New()
         {
+            return New(true);
+        }
+
+        public FullName New(bool useProbability)
+        {
             var maleGender = ThreadSafeRandom.NextBool();
 
             if (maleGender)
             {
-                return New(NameGender.Male);
+                return New(NameGender.Male, useProbability);
             }
             else
             {
-                return New(NameGender.Female);
+                return New(NameGender.Female, useProbability);
             }
         }
 
@@ -33,10 +38,15 @@ namespace NameGeneration
         /// <returns></returns>
         public FullName New(NameGender gender)
         {
+            return New(gender, true);
+        }
+
+        public FullName New(NameGender gender, bool useProbability)
+        {
             return new FullName()
             {
-                First = NewFirst(gender),
-                Last = NewLast(),
+                First = NewFirst(gender, useProbability),
+                Last = NewLast(useProbability),
                 Gender = gender
             };
         }
@@ -47,15 +57,20 @@ namespace NameGeneration
         /// <returns></returns>
         public String NewFirst()
         {
+            return NewFirst(true);
+        }
+
+        public String NewFirst(bool useProbability)
+        {
             var maleGender = ThreadSafeRandom.NextBool();
 
             if (maleGender)
             {
-                return NewFirst(NameGender.Male);
+                return NewFirst(NameGender.Male, useProbability);
             }
             else
             {
-                return NewFirst(NameGender.Female);
+                return NewFirst(NameGender.Female, useProbability);
             }
         }
 
@@ -66,14 +81,29 @@ namespace NameGeneration
         /// <returns></returns>
         public String NewFirst(NameGender gender)
         {
+            return NewFirst(gender, true);
+        }
+
+        public String NewFirst(NameGender gender, bool useProbability)
+        {
             List<NameRange> firstNameSet = (gender == NameGender.Male) ? Names.MaleNames : Names.FemaleNames;
-            var firstNameMax = (gender == NameGender.Male) ? Names.MaleFirstNameMax : Names.FemaleFirstNameMax;
 
-            var firstNameIndex = ThreadSafeRandom.Next(1, firstNameMax);
+            if (useProbability)
+            {
+                var firstNameMax = (gender == NameGender.Male) ? Names.MaleFirstNameMax : Names.FemaleFirstNameMax;
+                var occurance = ThreadSafeRandom.Next(1, firstNameMax);
 
-            return (from x in firstNameSet
-                    where x.Min < firstNameIndex && x.Max > firstNameIndex
-                    select x.Name).FirstOrDefault();
+                return (from x in firstNameSet
+                        where x.Min < occurance && x.Max > occurance
+                        select x.Name).FirstOrDefault();
+            }
+            else
+            {
+                var index = ThreadSafeRandom.Next(0, firstNameSet.Count - 1);
+
+                return firstNameSet[index].Name;
+            }
+            
         }
 
         /// <summary>
@@ -82,11 +112,25 @@ namespace NameGeneration
         /// <returns></returns>
         public String NewLast()
         {
-            var lastNameIndex = ThreadSafeRandom.Next(1, Names.LastNameMax);
+            return NewLast(true);
+        }
 
-            return (from x in Names.LastNames
-                    where x.Min < lastNameIndex && x.Max > lastNameIndex
-                    select x.Name).FirstOrDefault();
+        public String NewLast(bool useProbability)
+        {
+            if (useProbability)
+            {
+                var occurance = ThreadSafeRandom.Next(1, Names.LastNameMax);
+
+                return (from x in Names.LastNames
+                        where x.Min < occurance && x.Max > occurance
+                        select x.Name).FirstOrDefault();
+            }
+            else
+            {
+                var index = ThreadSafeRandom.Next(0, Names.LastNames.Count - 1);
+
+                return Names.LastNames[index].Name;
+            }
         }
     }
 

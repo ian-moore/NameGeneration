@@ -8,10 +8,11 @@ namespace NameGeneration.Demo
     {
         static void Main(string[] args)
         {
+            Console.Title = "NameGeneration Demo";
+
             var command = args.Length > 0 ? args[0].ToLower() : "help";
 
             var nameGenerator = new NameGenerator();
-            Console.Title = "NameGeneration Demo";
 
             while (true)
             {
@@ -23,7 +24,7 @@ namespace NameGeneration.Demo
                 {
                     ShowHelp();
                 }
-                else if (command == "rand")
+                else if (command == "prob")
                 {
                     var nameList = new List<FullName>();
 
@@ -49,10 +50,23 @@ namespace NameGeneration.Demo
                     nameList.ForEach(n => Write(n));
                     Write("---");
                 }
+                else if (command == "rand")
+                {
+                    var nameList = new List<FullName>();
+
+                    for (var i = 0; i < 10; i++)
+                    {
+                        nameList.Add(nameGenerator.New(false));
+                    }
+
+                    Write("---");
+                    nameList.ForEach(n => Write(n.Full));
+                    Write("---");
+                }
                 else if (command == "last")
                 {
                     var nameList = new List<string>();
-                    
+
                     for (var i = 0; i < 10; i++)
                     {
                         nameList.Add(nameGenerator.NewLast());
@@ -77,8 +91,9 @@ namespace NameGeneration.Demo
             {
                 "Available Commands:",
                 "    help - Show this legend",
-                "    rand - Generate 10 random names (male and female)",
-                "    boys - Generate 10 random first names (male)",
+                "    prob - Generate 10 random names by probability",
+                "    rand - Generate 10 random names without probability",
+                "    boys - Generate 10 random male first names",
                 "    last - Generate 10 random last names",
                 "    exit - Exit the demo",
             };
